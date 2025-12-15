@@ -1,51 +1,291 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
-<!-- ========================= SECTION MAIN ========================= -->
+
+<!-- ========================= HERO SECTION ========================= -->
 <section class="section-intro padding-y-sm">
   <div class="container">
-    <div class="intro-banner-wrap">
+    <div class="intro-banner-wrap position-relative">
       <img
         src="{% static 'images/banners/1.jpg' %}"
-        class="img-fluid rounded"
+        class="img-fluid rounded shadow"
         alt="Banner"
+        style="width: 100%; height: 400px; object-fit: cover;"
       />
+      {% comment %} <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+        <h1 class="display-4 font-weight-bold mb-3">Welcome to Shoe Nepal</h1>
+        <p class="lead mb-4">Your One-Stop Destination for Premium Footwear</p>
+        <a href="{% url 'store' %}" class="btn btn-primary btn-lg px-5 py-3">Shop Now</a>
+      </div>
+    </div> {% endcomment %}
+  </div>
+</section>
+<!-- ========================= HERO SECTION END// ========================= -->
+
+<!-- ========================= FEATURES SECTION ========================= -->
+<section class="section-name padding-y-sm bg-light">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-3 col-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
+            <h5 class="card-title">Free Shipping</h5>
+            <p class="card-text text-muted">On orders over Rs. 2000</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <i class="fas fa-undo fa-3x text-success mb-3"></i>
+            <h5 class="card-title">Easy Returns</h5>
+            <p class="card-text text-muted">30-day return policy</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <i class="fas fa-lock fa-3x text-info mb-3"></i>
+            <h5 class="card-title">Secure Payment</h5>
+            <p class="card-text text-muted">100% secure transactions</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <i class="fas fa-headset fa-3x text-warning mb-3"></i>
+            <h5 class="card-title">24/7 Support</h5>
+            <p class="card-text text-muted">Always here to help</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-<!-- ========================= SECTION MAIN END// ========================= -->
+<!-- ========================= FEATURES SECTION END// ========================= -->
 
-<!-- ========================= SECTION  ========================= -->
+<!-- ========================= CATEGORIES SECTION ========================= -->
+{% if categories %}
 <section class="section-name padding-y-sm">
   <div class="container">
-    <header class="section-heading">
-      <a href="{% url 'store' %}" class="btn btn-outline-primary float-right"
-        >See all</a
-      >
-      <h3 class="section-title">Popular Products</h3>
+    <header class="section-heading text-center mb-5">
+      <h2 class="section-title">Shop by Category</h2>
+      <p class="text-muted">Explore our wide range of footwear categories</p>
     </header>
+    <div class="row">
+      {% for category in categories %}
+      <div class="col-md-4 col-sm-6 mb-4">
+        <div class="card card-category border-0 shadow-sm h-100">
+          <a href="{{ category.get_url }}" class="text-decoration-none">
+            {% if category.cat_image %}
+            <img src="{{ category.cat_image.url }}" class="card-img-top" alt="{{ category.category_name }}" style="height: 250px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+              <i class="fas fa-shoe-prints fa-5x text-white"></i>
+            </div>
+            {% endif %}
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">{{ category.category_name }}</h5>
+              {% if category.description %}
+              <p class="card-text text-muted">{{ category.description|truncatewords:10 }}</p>
+              {% endif %}
+            </div>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'store' %}" class="btn btn-outline-primary btn-lg">View All Categories</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+<!-- ========================= CATEGORIES SECTION END// ========================= -->
 
+<!-- ========================= POPULAR PRODUCTS SECTION ========================= -->
+<section class="section-name padding-y-sm bg-light">
+  <div class="container">
+    <header class="section-heading text-center mb-5">
+      <h2 class="section-title">Popular Products</h2>
+      <p class="text-muted">Trending now - Don't miss out!</p>
+    </header>
     <div class="row">
       {% for product in products %}
-      <div class="col-md-3">
-        <div class="card card-product-grid">
-          <a href="{{ product.get_url }}" class="img-wrap">
+      <div class="col-md-3 col-sm-6 mb-4">
+        <div class="card card-product-grid border-0 shadow-sm h-100">
+          <a href="{{ product.get_url }}" class="img-wrap position-relative">
             <img
               src="{{ product.images.url }}"
               class="img-fluid"
               alt="{{ product.product_name }}"
+              style="height: 250px; object-fit: cover; width: 100%;"
             />
+            {% if product.stock <= 5 and product.stock > 0 %}
+            <span class="badge badge-warning position-absolute" style="top: 10px; right: 10px;">Low Stock</span>
+            {% elif product.stock == 0 %}
+            <span class="badge badge-danger position-absolute" style="top: 10px; right: 10px;">Out of Stock</span>
+            {% endif %}
           </a>
-          <figcaption class="info-wrap">
-            <a href="{{ product.get_url }}" class="title"
-              >{{ product.product_name }}</a
-            >
-            <div class="price mt-1">RS:{{ product.price }}</div>
+          <figcaption class="info-wrap p-3">
+            <a href="{{ product.get_url }}" class="title text-dark text-decoration-none">
+              <h6 class="font-weight-bold">{{ product.product_name }}</h6>
+            </a>
+            {% if product.description %}
+            <p class="text-muted small mb-2">{{ product.description|truncatewords:8 }}</p>
+            {% endif %}
+            <div class="price-wrap">
+              <span class="price font-weight-bold text-primary h5 mb-0">Rs. {{ product.price }}</span>
+              {% if product.averageReview %}
+              <div class="mt-2">
+                <span class="text-warning">
+                  <i class="fas fa-star"></i>
+                  <small class="text-muted">{{ product.averageReview|floatformat:1 }} ({{ product.countReview }} reviews)</small>
+                </span>
+              </div>
+              {% endif %}
+            </div>
+            <a href="{{ product.get_url }}" class="btn btn-primary btn-sm btn-block mt-3">View Details</a>
           </figcaption>
         </div>
       </div>
       {% empty %}
-      <p class="text-center">No products available at the moment.</p>
+      <div class="col-12">
+        <p class="text-center text-muted">No products available at the moment. Check back soon!</p>
+      </div>
       {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'store' %}" class="btn btn-primary btn-lg">See All Products</a>
     </div>
   </div>
 </section>
+<!-- ========================= POPULAR PRODUCTS SECTION END// ========================= -->
+
+<!-- ========================= WHY CHOOSE US SECTION ========================= -->
+<section class="section-name padding-y-sm">
+  <div class="container">
+    <header class="section-heading text-center mb-5">
+      <h2 class="section-title">Why Choose Us?</h2>
+      <p class="text-muted">We're committed to providing the best shopping experience</p>
+    </header>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="text-center">
+          <div class="mb-3">
+            <i class="fas fa-check-circle fa-3x text-success"></i>
+          </div>
+          <h5>Authentic Products</h5>
+          <p class="text-muted">100% genuine footwear from trusted brands. Quality guaranteed!</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="text-center">
+          <div class="mb-3">
+            <i class="fas fa-truck fa-3x text-primary"></i>
+          </div>
+          <h5>Fast Delivery</h5>
+          <p class="text-muted">Quick and reliable delivery across Nepal. Get your orders in 2-5 business days.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="text-center">
+          <div class="mb-3">
+            <i class="fas fa-rupee-sign fa-3x text-warning"></i>
+          </div>
+          <h5>Best Prices</h5>
+          <p class="text-muted">Competitive pricing with regular discounts and special offers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ========================= WHY CHOOSE US SECTION END// ========================= -->
+
+<!-- ========================= STATISTICS SECTION ========================= -->
+<section class="section-name padding-y-sm bg-primary text-white">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-3 col-6 mb-4">
+        <div class="py-3">
+          <h2 class="display-4 font-weight-bold">1000+</h2>
+          <p class="lead">Happy Customers</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="py-3">
+          <h2 class="display-4 font-weight-bold">500+</h2>
+          <p class="lead">Products Available</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="py-3">
+          <h2 class="display-4 font-weight-bold">50+</h2>
+          <p class="lead">Brands</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="py-3">
+          <h2 class="display-4 font-weight-bold">24/7</h2>
+          <p class="lead">Customer Support</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ========================= STATISTICS SECTION END// ========================= -->
+
+<!-- ========================= NEWSLETTER SECTION ========================= -->
+<section class="section-name padding-y-sm bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card border-0 shadow-lg">
+          <div class="card-body text-center p-5">
+            <h3 class="card-title mb-3">Stay Updated</h3>
+            <p class="text-muted mb-4">Subscribe to our newsletter and get exclusive deals, new arrivals, and special offers delivered to your inbox!</p>
+            <form class="form-inline justify-content-center" method="post" action="#">
+              {% csrf_token %}
+              <div class="input-group mb-2" style="max-width: 400px;">
+                <input type="email" class="form-control form-control-lg" placeholder="Enter your email" required>
+                <div class="input-group-append">
+                  <button class="btn btn-primary btn-lg" type="submit">Subscribe</button>
+                </div>
+              </div>
+            </form>
+            <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ========================= NEWSLETTER SECTION END// ========================= -->
+
+<style>
+  .card-category:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+  }
+
+  .card-product-grid:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .img-wrap {
+    overflow: hidden;
+  }
+
+  .img-wrap img {
+    transition: transform 0.3s ease;
+  }
+
+  .img-wrap:hover img {
+    transform: scale(1.1);
+  }
+</style>
+
 {% endblock %}
