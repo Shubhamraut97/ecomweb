@@ -148,6 +148,8 @@ EMAIL_HOST_USER = "testshub190@gmail.com"
 EMAIL_HOST_PASSWORD = "qrkgymnxbxcodgtm"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # ======================
 # Khalti Configuration (Classic Checkout)

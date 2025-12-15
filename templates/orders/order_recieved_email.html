@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Order Confirmation - Shoe Nepal</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+        color: #111827;
+      }
+      .wrapper {
+        width: 100%;
+        padding: 24px 0;
+      }
+      .email-container {
+        max-width: 640px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      }
+      .email-header {
+        background: linear-gradient(135deg, #3167eb, #111827);
+        padding: 20px 24px;
+        color: #ffffff;
+      }
+      .email-header h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .email-body {
+        padding: 24px;
+      }
+      .email-body h2 {
+        font-size: 18px;
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+      .email-body p {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .order-summary {
+        margin-top: 16px;
+        border-top: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 16px 0;
+      }
+      .order-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .order-row strong {
+        font-weight: 600;
+      }
+      .order-meta {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+      .highlight {
+        background-color: #eff6ff;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 13px;
+        margin-top: 12px;
+      }
+      .footer {
+        padding: 16px 24px 20px 24px;
+        font-size: 12px;
+        color: #9ca3af;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="email-container">
+        <div class="email-header">
+          <h1>Shoe Nepal - Order Confirmation</h1>
+        </div>
+        <div class="email-body">
+          <h2>Hi {{ user.first_name }},</h2>
+          <p>Thank you for shopping with <strong>Shoe Nepal</strong>! 🛒</p>
+          <p>We have received your order and our team will contact you soon. Your order will be delivered within <strong>2–3 days</strong>.</p>
+
+          <div class="order-summary">
+            <div class="order-row">
+              <span>Order Number</span>
+              <strong>{{ order.order_number }}</strong>
+            </div>
+            <div class="order-row">
+              <span>Order Total</span>
+              <strong>Rs {{ order.order_total }}</strong>
+            </div>
+            <div class="order-row">
+              <span>Payment Status</span>
+              <strong>{{ order.payment.status|default:"Completed" }}</strong>
+            </div>
+            <div class="order-meta">
+              Shipping to: {{ order.full_name }} — {{ order.full_address }}, {{ order.city }}, {{ order.state }}, {{ order.country }}
+            </div>
+          </div>
+
+          <div class="highlight">
+            <p><strong>What happens next?</strong></p>
+            <ul style="padding-left: 18px; margin: 6px 0;">
+              <li>Our team will call you to confirm the delivery details.</li>
+              <li>Your order will be packed and dispatched within 24 hours.</li>
+              <li>Delivery is usually completed within 2–3 business days.</li>
+            </ul>
+          </div>
+
+          <p>If you have any questions or need help, just reply to this email.</p>
+          <p>Best regards,<br><strong>Shoe Nepal Team</strong></p>
+        </div>
+        <div class="footer">
+          <p>This is an automated email regarding your recent order on Shoe Nepal.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
+
+

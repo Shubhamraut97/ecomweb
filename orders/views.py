@@ -186,13 +186,27 @@ def khalti_lookup(request):
         return redirect("checkout")
 
     # Expecting fields: status, purchase_order_id, total_amount, etc.
-    if resp.status_code == 200 and data.get("status") in ("Completed", "completed", "Success", "success"):
-        order_id = data.get("purchase_order_id")
+    status_value = str(data.get("status", "")).lower() if isinstance(data, dict) else ""
+    is_success = resp.status_code == 200 and status_value in ("completed", "success")
+    if is_success:
+        order_id = data.get("purchase_order_id") or request.session.get("order_number")
         total_amount = data.get("total_amount", 0)
+        order = None
         try:
             order = Order.objects.get(order_number=order_id, is_ordered=False)
         except Order.DoesNotExist:
-            return redirect("home")
+            # If already processed, just show success and skip duplication
+            try:
+                order = Order.objects.get(order_number=order_id, is_ordered=True)
+                messages.success(
+                    request,
+                    "Payment successful! Thank you for shopping with us. "
+                    "You will receive a call from our team and get your order within 2–3 days."
+                )
+                return redirect("home")
+            except Order.DoesNotExist:
+                messages.error(request, "Payment succeeded but order was not found.")
+                return redirect("home")
 
         # Create payment and complete order
         payment = Payment.objects.create(
@@ -208,8 +222,16 @@ def khalti_lookup(request):
         order.is_ordered = True
         order.save()
 
-        # Move cart items to OrderProduct and reduce stock
+        # Move cart items to OrderProduct and reduce stock (cover both user and session carts)
         cart_items = CartItem.objects.filter(user=request.user)
+        if not cart_items.exists():
+            try:
+                from carts.views import _cart_id
+                session_cart = _cart_id(request)
+                cart_items = CartItem.objects.filter(cart__cart_id=session_cart)
+            except Exception:
+                cart_items = CartItem.objects.none()
+
         for item in cart_items:
             orderproduct = OrderProduct.objects.create(
                 order_id=order.id,
@@ -227,7 +249,14 @@ def khalti_lookup(request):
             product.stock -= item.quantity
             product.save()
 
+        # Clear carts (both user-linked and session carts)
         CartItem.objects.filter(user=request.user).delete()
+        try:
+            from carts.views import _cart_id
+            session_cart = _cart_id(request)
+            CartItem.objects.filter(cart__cart_id=session_cart).delete()
+        except Exception:
+            pass
 
         # Send order email
         mail_subject = "Thank you for your order!"
@@ -235,18 +264,41 @@ def khalti_lookup(request):
             "orders/order_recieved_email.html",
             {"user": request.user, "order": order},
         )
-        EmailMessage(mail_subject, message, to=[request.user.email]).send()
+        # Send confirmation email (HTML) to billing email, fallback to account email
+        recipient_email = order.email or getattr(order.user, "email", None)
+        if recipient_email:
+            try:
+                email = EmailMessage(
+                    mail_subject,
+                    message,
+                    to=[recipient_email],
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                )
+                email.content_subtype = "html"  # render HTML template properly
+                email.send(fail_silently=False)
+            except Exception as e:
+                messages.error(request, f"Email send failed: {e}")
+        else:
+            messages.error(request, "Email not sent: no recipient email found on order.")
 
-        # Show success message and redirect to landing page
+
         messages.success(
             request,
-            "Payment successful! You will receive your order in 2–3 days. "
-            "Thank you for shopping with us."
+            "Payment successful! Thank you for shopping with us. "
+            "You will receive a call from our team and get your order within 2–3 days."
         )
         return redirect("home")
 
     # Failed lookup or cancelled
-    messages.error(request, "Payment not completed. You can try again.")
+    err_msg = (
+        data.get("detail")
+        or data.get("message")
+        or data.get("error")
+        or f"Status: {data.get('status', 'unknown')}"
+        if isinstance(data, dict)
+        else "Payment not completed."
+    )
+    messages.error(request, f"Payment not completed. {err_msg}")
     # Re-render payments so user can retry
     try:
         order_id = data.get("purchase_order_id")
@@ -259,6 +311,13 @@ def khalti_lookup(request):
 # Helper to render the payments page with current cart totals
 def _render_payments_page(request, order):
     cart_items = CartItem.objects.filter(user=request.user)
+    if not cart_items.exists():
+        try:
+            from carts.views import _cart_id
+            session_cart = _cart_id(request)
+            cart_items = CartItem.objects.filter(cart__cart_id=session_cart)
+        except Exception:
+            cart_items = CartItem.objects.none()
     total = 0
     quantity = 0
     for item in cart_items:
