@@ -17,9 +17,7 @@ from .forms import OrderForm
 from .models import Order, OrderProduct, Payment
 
 
-# ==========================
-# PLACE ORDER VIEW
-# ==========================
+
 def place_order(request, total=0, quantity=0):
     current_user = request.user
 
@@ -82,12 +80,7 @@ def place_order(request, total=0, quantity=0):
     return redirect("checkout")
 
 
-# (Classic widget verify view removed; using ePayment flow instead)
 
-
-# ==========================
-# ORDER COMPLETE VIEW
-# ==========================
 def order_complete(request):
     order_number = request.GET.get("order_number")
     transID = request.GET.get("payment_id")
@@ -244,7 +237,13 @@ def khalti_lookup(request):
         )
         EmailMessage(mail_subject, message, to=[request.user.email]).send()
 
-        return redirect(f"{reverse('order_complete')}?order_number={order.order_number}&payment_id={payment.payment_id}")
+        # Show success message and redirect to landing page
+        messages.success(
+            request,
+            "Payment successful! You will receive your order in 2–3 days. "
+            "Thank you for shopping with us."
+        )
+        return redirect("home")
 
     # Failed lookup or cancelled
     messages.error(request, "Payment not completed. You can try again.")

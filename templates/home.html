@@ -1,26 +1,44 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 
-<!-- ========================= HERO SECTION ========================= -->
-<section class="section-intro padding-y-sm">
+
+<section class="section-intro padding-y-sm bg-light">
   <div class="container">
-    <div class="intro-banner-wrap position-relative">
-      <img
-        src="{% static 'images/banners/1.jpg' %}"
-        class="img-fluid rounded shadow"
-        alt="Banner"
-        style="width: 100%; height: 400px; object-fit: cover;"
-      />
-      {% comment %} <div class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
-        <h1 class="display-4 font-weight-bold mb-3">Welcome to Shoe Nepal</h1>
-        <p class="lead mb-4">Your One-Stop Destination for Premium Footwear</p>
-        <a href="{% url 'store' %}" class="btn btn-primary btn-lg px-5 py-3">Shop Now</a>
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <span class="badge badge-primary-soft mb-3">New Season Arrivals</span>
+        <h1 class="display-4 font-weight-bold">Step Into Comfort & Style</h1>
+        <p class="lead text-muted">
+          Curated sneakers, runners, and everyday essentials from trusted brands.
+          Free shipping over Rs. 2000 and 30-day easy returns.
+        </p>
+        <div class="d-flex flex-wrap align-items-center mt-3">
+          <a href="{% url 'store' %}" class="btn btn-primary btn-lg mr-3 mb-2">Shop Best Sellers</a>
+          <a href="{% url 'store' %}" class="btn btn-outline-primary btn-lg mb-2">View All Products</a>
+        </div>
+        <div class="d-flex flex-wrap text-muted small mt-3">
+          <div class="mr-3"><i class="fas fa-star text-warning"></i> 4.8/5 rated by customers</div>
+          <div><i class="fas fa-shield-alt text-success"></i> Secure checkout</div>
+        </div>
       </div>
-    </div> {% endcomment %}
+      <div class="col-lg-6">
+        <div class="hero-visual rounded-lg shadow-lg position-relative overflow-hidden">
+          <div class="hero-overlay"></div>
+          <img
+            src="{% static 'images/banners/12.png' %}"
+            class="img-fluid"
+            alt="Banner"
+            style="width: 100%; height: 420px; object-fit: cover;"
+          />
+          <div class="hero-badge">
+            <span class="badge badge-light text-dark">Limited Time Offer</span>
+            <p class="mb-0 text-white mt-2">Up to 25% off select styles</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-<!-- ========================= HERO SECTION END// ========================= -->
 
-<!-- ========================= FEATURES SECTION ========================= -->
 <section class="section-name padding-y-sm bg-light">
   <div class="container">
     <div class="row text-center">
@@ -138,12 +156,20 @@
             <div class="price-wrap">
               <span class="price font-weight-bold text-primary h5 mb-0">Rs. {{ product.price }}</span>
               {% if product.averageReview %}
-              <div class="mt-2">
-                <span class="text-warning">
-                  <i class="fas fa-star"></i>
-                  <small class="text-muted">{{ product.averageReview|floatformat:1 }} ({{ product.countReview }} reviews)</small>
+              {% with avg=product.averageReview|floatformat:1 %}
+              <div class="d-flex align-items-center mt-2">
+                <span class="text-warning mr-2">
+                  {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= avg|floatformat:0 %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
                 </span>
+                <small class="text-muted">{{ avg }} ({{ product.countReview }} reviews)</small>
               </div>
+              {% endwith %}
               {% endif %}
             </div>
             <a href="{{ product.get_url }}" class="btn btn-primary btn-sm btn-block mt-3">View Details</a>
@@ -236,6 +262,70 @@
 </section>
 <!-- ========================= STATISTICS SECTION END// ========================= -->
 
+<!-- ========================= TESTIMONIALS SECTION ========================= -->
+<section class="section-name padding-y-sm">
+  <div class="container">
+    <header class="section-heading text-center mb-5">
+      <h2 class="section-title">Customers Love Us</h2>
+      <p class="text-muted">Real feedback from our community</p>
+    </header>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="avatar-circle bg-primary text-white mr-3">S</div>
+              <div>
+                <h6 class="mb-0">shubham raut</h6>
+                <small class="text-muted">Kathmandu</small>
+              </div>
+            </div>
+            <p class="text-muted">“Great quality sneakers and super quick delivery. The fit guide was spot on.”</p>
+            <div class="text-warning">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="avatar-circle bg-success text-white mr-3">S</div>
+              <div>
+                <h6 class="mb-0">Sudan Gautam.</h6>
+                <small class="text-muted">Pokhara</small>
+              </div>
+            </div>
+            <p class="text-muted">“Loved the easy returns process. Customer support was friendly and fast.”</p>
+            <div class="text-warning">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="avatar-circle bg-info text-white mr-3">R</div>
+              <div>
+                <h6 class="mb-0">Rojan shrestha.</h6>
+                <small class="text-muted">Lalitpur</small>
+              </div>
+            </div>
+            <p class="text-muted">“Best prices I’ve found online. The newsletter deals are worth signing up for.”</p>
+            <div class="text-warning">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ========================= TESTIMONIALS SECTION END// ========================= -->
+
 <!-- ========================= NEWSLETTER SECTION ========================= -->
 <section class="section-name padding-y-sm bg-light">
   <div class="container">
@@ -264,6 +354,37 @@
 <!-- ========================= NEWSLETTER SECTION END// ========================= -->
 
 <style>
+  .badge-primary-soft {
+    background: rgba(49, 103, 235, 0.12);
+    color: #3167eb;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .hero-visual {
+    background: #0f172a;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
+    z-index: 1;
+  }
+
+  .hero-visual img {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hero-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 2;
+  }
+
   .card-category:hover {
     transform: translateY(-5px);
     transition: transform 0.3s ease;
@@ -285,6 +406,16 @@
 
   .img-wrap:hover img {
     transform: scale(1.1);
+  }
+
+  .avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
   }
 </style>
 
