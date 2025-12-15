@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <section class="section-content padding-y bg">
+    <div class="container">
+      <h4 class="text-center mb-20">Review Your Order and Make Payment</h4>
+      <div class="row">
+        <!-- LEFT: Billing & Products -->
+        <aside class="col-lg-8">
+          <!-- Billing Address -->
+          <div class="card mb-3">
+            <h5 class="card-header">Billing Address</h5>
+            <div class="card-body">
+              <p>{{ order.full_name }}</p>
+              <p>{{ order.full_address }}</p>
+              <p>{{ order.city }}, {{ order.state }}, {{ order.country }}</p>
+              <p>{{ order.email }}</p>
+              <p>{{ order.phone }}</p>
+              {% if order.order_note %}<b>Order Note:</b> {{ order.order_note }}{% endif %}
+            </div>
+          </div>
+          <!-- Products -->
+          <div class="card mb-3">
+            <h5 class="card-header">Review Products</h5>
+            <div class="card-body">
+              <table class="table table-borderless">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for cart_item in cart_items %}
+                    <tr>
+                      <td>{{ cart_item.product.product_name }}</td>
+                      <td>{{ cart_item.quantity }}</td>
+                      <td>Rs {{ cart_item.sub_total }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </aside>
+        <!-- RIGHT: Payment Summary -->
+        <aside class="col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <dl class="dlist-align">
+                <dt>Total:</dt>
+                <dd class="text-right">
+                  Rs {{ total }}
+                </dd>
+              </dl>
+              <dl class="dlist-align">
+                <dt>Tax:</dt>
+                <dd class="text-right">
+                  Rs {{ tax }}
+                </dd>
+              </dl>
+              <dl class="dlist-align">
+                <dt>Grand Total:</dt>
+                <dd class="text-right text-dark b">
+                  <strong>Rs {{ grand_total }}</strong>
+                </dd>
+              </dl>
+              <hr>
+              <div id="payment-container" class="text-center">
+                <button id="payment-button" class="btn btn-primary btn-block">Pay with Khalti</button>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info mt-3">
+            {% comment %} <b>Note:</b> This is test mode. Use Khalti test credentials only. {% endcomment %}
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <!-- JS Dependencies come from base.html -->
+  <form action="{% url 'khalti_initiate' %}" method="post" class="d-none" id="khalti-initiate-form">
+    {% csrf_token %}
+  </form>
+  <script>
+    (function(){
+      const btn = document.getElementById('payment-button');
+      if (!btn) return;
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        document.getElementById('khalti-initiate-form').submit();
+      });
+    })();
+  </script>
+{% endblock %}

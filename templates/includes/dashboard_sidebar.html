@@ -1,0 +1,17 @@
+<aside class="col-md-3">
+  <nav class="list-group">
+    <a class="list-group-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+      <i class="fa fa-dashboard"></i> Dashboard
+    </a>
+    <a class="list-group-item {% if request.resolver_match.url_name == 'my_orders' %}active{% endif %}" href="{% url 'my_orders' %}">
+      <i class="fa fa-shopping-bag"></i> My Orders
+    </a>
+    <a class="list-group-item {% if request.resolver_match.url_name == 'edit_profile' %}active{% endif %}" href="#">
+      <i class="fa fa-user"></i> Edit Profile
+    </a>
+    <a class="list-group-item {% if request.resolver_match.url_name == 'change_password' %}active{% endif %}" href="{% url 'change_password' %}">
+      <i class="fa fa-key"></i> Change Password
+    </a>
+  </nav>
+</aside>
+
