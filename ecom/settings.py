@@ -125,10 +125,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+
+# In development, serve from both the project-level "static" folder
+# and the app-specific "ecom/static" folder.
 STATICFILES_DIRS = [
-    "ecom/static",
+    BASE_DIR / "static",
+    BASE_DIR / "ecom/static",
 ]
+
+# Collected static files destination (for production collectstatic)
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 MEDIA_URL = "/media/"
@@ -151,9 +157,6 @@ EMAIL_PORT = 587
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# ======================
-# Khalti Configuration (Classic Checkout)
-# ======================
 KHALTI_PUBLIC_KEY = "4391cc05039347a2b4aabf7a596d74c4"
 KHALTI_SECRET_KEY = "1c313780b8a3447488887fe28d900553"
 KHALTI_PAYMENT_URL = "https://a.khalti.com/api/v2/epayment/initiate/"

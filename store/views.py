@@ -49,41 +49,23 @@ def product_detail(request, category_slug, product_slug):
     except Exception as e:
         raise e
 
-    # if request.user.is_authenticated:
-    #     try:
-    #         orderproduct = OrderProduct.objects.filter(
-    #             user=request.user, product_id=single_product.id
-    #         ).exists()
-    #     except OrderProduct.DoesNotExist:
-    #         orderproduct = None
-    # else:
-    #     orderproduct = None
-
-    # # Get the reviews
-    # reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
-
-    # # Get the product gallery
-    # product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
-
-    # ===== Content-based Recommendation =====
-    # Get all products (you can filter out the current one)
     products = Product.objects.filter(is_available=True).exclude(id=single_product.id)
 
-    # Prepare corpus of text (name + description)
+
     corpus = [single_product.product_name + " " + (single_product.description or "")]
     product_texts = [p.product_name + " " + (p.description or "") for p in products]
 
-    # Combine for TF-IDF
+
     corpus.extend(product_texts)
 
-    # TF-IDF vectorization
+
     vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(corpus)
 
-    # Compute cosine similarities
+
     cosine_sim = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
 
-    # Get top 4 similar products
+
     top_indices = np.argsort(cosine_sim)[::-1][:4]
     recommended_products = [products[int(i)] for i in top_indices if cosine_sim[i] > 0]
 
@@ -91,9 +73,7 @@ def product_detail(request, category_slug, product_slug):
         "single_product": single_product,
         "in_cart": in_cart,
         "recommended_products": recommended_products,
-        # 'orderproduct': orderproduct,
-        # 'reviews': reviews,
-        # 'product_gallery': product_gallery,
+
     }
     return render(request, "store/product_detail.html", context)
 
@@ -112,26 +92,3 @@ def search(request):
     }
     return render(request, "store/store.html", context)
 
-
-# def submit_review(request, product_id):
-#     url = request.META.get('HTTP_REFERER')
-#     if request.method == 'POST':
-#         try:
-#             reviews = ReviewRating.objects.get(user__id=request.user.id, product__id=product_id)
-#             form = ReviewForm(request.POST, instance=reviews)
-#             form.save()
-#             messages.success(request, 'Thank you! Your review has been updated.')
-#             return redirect(url)
-#         except ReviewRating.DoesNotExist:
-#             form = ReviewForm(request.POST)
-#             if form.is_valid():
-#                 data = ReviewRating()
-#                 data.subject = form.cleaned_data['subject']
-#                 data.rating = form.cleaned_data['rating']
-#                 data.review = form.cleaned_data['review']
-#                 data.ip = request.META.get('REMOTE_ADDR')
-#                 data.product_id = product_id
-#                 data.user_id = request.user.id
-#                 data.save()
-#                 messages.success(request, 'Thank you! Your review has been submitted.')
-#                 return redirect(url)
